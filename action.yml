@@ -1,0 +1,23 @@
+name: "Auto-sync"
+description: "Sync a source branch to one or more target branches"
+author: "Wilmer Carranza"
+
+inputs:
+  token:
+    description: "Token used to authenticate with GitHub to perform the merge command"
+    required: true
+    default: ${{ github.token }}
+  source:
+    description: "Source branch that you wish synced to target branches"
+    required: true
+    default: ${{ github.ref }}
+  target_glob:
+    description: "Glob that represents the target branches"
+    required: true
+
+runs:
+  using: "node16"
+  main: "dist/main.js"
+branding:
+  icon: git-merge
+  color: purple

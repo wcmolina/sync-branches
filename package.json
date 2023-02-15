@@ -1,0 +1,27 @@
+{
+  "name": "auto-merge",
+  "version": "1.0.0",
+  "description": "Auto-merge a branch into others",
+  "main": "index.js",
+  "scripts": {
+    "format": "prettier --write src/**.ts",
+    "lint": "eslint src/**.ts",
+    "esbuild": "esbuild src/main.ts --bundle --outdir=dist --platform=node"
+  },
+  "author": "Wilmer",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@actions/github": "^5.1.1",
+    "esbuild": "^0.17.8"
+  },
+  "devDependencies": {
+    "@types/node": "^18.13.0",
+    "@typescript-eslint/eslint-plugin": "^5.52.0",
+    "@typescript-eslint/parser": "^5.52.0",
+    "eslint": "^8.34.0",
+    "prettier": "^2.8.4",
+    "prettier-plugin-organize-imports": "^3.2.2",
+    "typescript": "^4.9.5"
+  }
+}
