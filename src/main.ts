@@ -13,40 +13,19 @@ async function run(): Promise<void> {
     // Get inputs: token, source, target_glob
     const token: string = getInput("token");
     const source: string = getInput("source");
-    const glob: string = getInput("target_glob");
+    const targets: string[] = JSON.parse(getInput("targets"));
 
     // Init stuff
-    const regex: RegExp = new RegExp(glob);
     const client = getOctokit(token);
     const repository = context.repo;
 
-    // Get branches
-    const branches = await client.request(
-      "GET /repos/{owner}/{repo}/branches",
-      {
-        owner: repository.owner,
-        repo: repository.repo,
-      }
-    );
-
-    info(`Retrieved ${branches.data.length} branches`);
-
-    // Filter branches that match 'targets' glob
-    const targets = branches.data.filter((branch) =>
-      regex.test(branch.name)
-    ) as { name: string }[];
-
-    info(`${targets.length} branches match the glob`);
-
     for (const target of targets) {
-      const { name } = target;
-
-      info(`Attempting to merge '${name}'`);
+      info(`Attempting to merge '${target}' into '${source}'`);
 
       // Build merge commit message
       const message = COMMIT_MSG.replace("{source}", source).replace(
         "{target}",
-        name
+        target
       );
 
       // Merge source branch to target branch
@@ -56,7 +35,7 @@ async function run(): Promise<void> {
           {
             owner: repository.owner,
             repo: repository.repo,
-            base: name,
+            base: target,
             head: source,
             commit_message: message,
           }
@@ -64,11 +43,11 @@ async function run(): Promise<void> {
 
         switch (merge.status) {
           case 201: {
-            mergeStatus.merged.push(name);
+            mergeStatus.merged.push(target);
             break;
           }
           case 204: {
-            mergeStatus.alreadyMerged.push(name);
+            mergeStatus.alreadyMerged.push(target);
             break;
           }
           default:
@@ -77,8 +56,8 @@ async function run(): Promise<void> {
       } catch (error: any) {
         const { data = {} } = error.response || {};
         const { message = `Unknown error occurred: ${error}` } = data;
-        info(`Unable to sync branch '${name}': ${message}`);
-        mergeStatus.failed.push(name);
+        info(`Unable to sync branch '${target}': ${message}`);
+        mergeStatus.failed.push(target);
       }
     }
 

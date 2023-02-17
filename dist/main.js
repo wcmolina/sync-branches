@@ -7792,28 +7792,14 @@ function run() {
     try {
       const token = (0, import_core.getInput)("token");
       const source = (0, import_core.getInput)("source");
-      const glob = (0, import_core.getInput)("target_glob");
-      const regex = new RegExp(glob);
+      const targets = JSON.parse((0, import_core.getInput)("targets"));
       const client = (0, import_github.getOctokit)(token);
       const repository = import_github.context.repo;
-      const branches = yield client.request(
-        "GET /repos/{owner}/{repo}/branches",
-        {
-          owner: repository.owner,
-          repo: repository.repo
-        }
-      );
-      (0, import_core.info)(`Retrieved ${branches.data.length} branches`);
-      const targets = branches.data.filter(
-        (branch) => regex.test(branch.name)
-      );
-      (0, import_core.info)(`${targets.length} branches match the glob`);
       for (const target of targets) {
-        const { name } = target;
-        (0, import_core.info)(`Attempting to merge '${name}'`);
+        (0, import_core.info)(`Attempting to merge '${target}' into '${source}'`);
         const message = COMMIT_MSG.replace("{source}", source).replace(
           "{target}",
-          name
+          target
         );
         try {
           const merge = yield client.request(
@@ -7821,18 +7807,18 @@ function run() {
             {
               owner: repository.owner,
               repo: repository.repo,
-              base: name,
+              base: target,
               head: source,
               commit_message: message
             }
           );
           switch (merge.status) {
             case 201: {
-              mergeStatus.merged.push(name);
+              mergeStatus.merged.push(target);
               break;
             }
             case 204: {
-              mergeStatus.alreadyMerged.push(name);
+              mergeStatus.alreadyMerged.push(target);
               break;
             }
             default:
@@ -7841,8 +7827,8 @@ function run() {
         } catch (error) {
           const { data = {} } = error.response || {};
           const { message: message2 = `Unknown error occurred: ${error}` } = data;
-          (0, import_core.info)(`Unable to sync branch '${name}': ${message2}`);
-          mergeStatus.failed.push(name);
+          (0, import_core.info)(`Unable to sync branch '${target}': ${message2}`);
+          mergeStatus.failed.push(target);
         }
       }
       const output = generateOutput(mergeStatus);
