@@ -11,8 +11,8 @@ inputs:
     description: "Source branch that you wish synced to target branches"
     required: true
     default: ${{ github.ref }}
-  target_glob:
-    description: "Glob that represents the target branches"
+  targets:
+    description: "JSON array containing target branches (strings)"
     required: true
 
 runs:
