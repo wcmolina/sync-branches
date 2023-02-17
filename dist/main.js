@@ -7796,7 +7796,7 @@ function run() {
       const client = (0, import_github.getOctokit)(token);
       const repository = import_github.context.repo;
       for (const target of targets) {
-        (0, import_core.info)(`Attempting to merge '${target}' into '${source}'`);
+        (0, import_core.info)(`Attempting to merge '${source}' into '${target}'`);
         const message = COMMIT_MSG.replace("{source}", source).replace(
           "{target}",
           target

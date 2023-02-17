@@ -20,7 +20,7 @@ async function run(): Promise<void> {
     const repository = context.repo;
 
     for (const target of targets) {
-      info(`Attempting to merge '${target}' into '${source}'`);
+      info(`Attempting to merge '${source}' into '${target}'`);
 
       // Build merge commit message
       const message = COMMIT_MSG.replace("{source}", source).replace(
