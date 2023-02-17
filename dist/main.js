@@ -7803,11 +7803,14 @@ function run() {
           repo: repository.repo
         }
       );
+      (0, import_core.info)(`Retrieved ${branches.data.length} branches`);
       const targets = branches.data.filter(
         (branch) => regex.test(branch.name)
       );
+      (0, import_core.info)(`${targets.length} branches match the glob`);
       for (const target of targets) {
         const { name } = target;
+        (0, import_core.info)(`Attempting to merge '${name}'`);
         const message = COMMIT_MSG.replace("{source}", source).replace(
           "{target}",
           name

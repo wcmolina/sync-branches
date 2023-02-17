@@ -29,13 +29,19 @@ async function run(): Promise<void> {
       }
     );
 
+    info(`Retrieved ${branches.data.length} branches`);
+
     // Filter branches that match 'targets' glob
     const targets = branches.data.filter((branch) =>
       regex.test(branch.name)
     ) as { name: string }[];
 
+    info(`${targets.length} branches match the glob`);
+
     for (const target of targets) {
       const { name } = target;
+
+      info(`Attempting to merge '${name}'`);
 
       // Build merge commit message
       const message = COMMIT_MSG.replace("{source}", source).replace(
